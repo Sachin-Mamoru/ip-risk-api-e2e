@@ -16,8 +16,6 @@ type ipGeolocationResp record {
 service / on new http:Listener(8090) {
     resource function post risk(@http:Payload RiskRequest req) returns RiskResponse|error? {
 
-        string ip = req.ip;
-
         RiskResponse resp = {
             // hasRisk is true if the country code of the IP address is not the specified country code.
             hasRisk: true
