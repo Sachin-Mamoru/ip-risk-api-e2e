@@ -5,7 +5,8 @@ type RiskResponse record {
 };
 
 type RiskRequest record {
-    string ip;
+    string username;
+    string loggingIp;
 };
 
 type ipGeolocationResp record {
