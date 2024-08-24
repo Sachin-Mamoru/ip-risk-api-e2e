@@ -1,6 +1,7 @@
 import ballerina/http;
 import ballerina/jwt;
 import ballerina/time;
+import ballerina/io;
 
 type RiskResponse record {
     boolean hasRisk;
@@ -95,10 +96,14 @@ function checkIat(http:Headers headers) returns boolean|error? {
 
     if (payload.hasKey("iat")) {
         int iat = <int>payload["iat"];
-        int currentTime = time:currentTime().unixTime();
+        time:Utc currentUtc = time:utcNow();
+        int currentTime = currentUtc[0];
         
         // Optional: Define an acceptable time window, e.g., 5 minutes (300 seconds)
         int acceptableWindow = 300;
+
+        io:println("test");
+        io:println((currentTime - iat));
 
         // Check if the iat is within the acceptable time window
         if ((currentTime - iat) <= acceptableWindow) {
