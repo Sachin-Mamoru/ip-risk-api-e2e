@@ -22,6 +22,8 @@ service / on new http:Listener(8090) {
 
         io:println(getIssuer(headers));
 
+        io:println(headers);
+
         if (getIssuer(headers) == "https://api.asgardeo.io/t/sachinmtestorg2/oauth2/token"){
             if (check checkScopes(headers) ?: false) {
                 return resp;
