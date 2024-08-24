@@ -1,5 +1,6 @@
 import ballerina/http;
 import ballerina/jwt;
+import ballerina/time;
 
 type RiskResponse record {
     boolean hasRisk;
@@ -19,7 +20,9 @@ service / on new http:Listener(8090) {
 
         if (getIssuer(headers) == "https://api.asgardeo.io/t/sachinmtestorg2/oauth2/token"){
             if (check checkScopes(headers) ?: false) {
-                return resp;
+                if (check checkIat(headers) ?: false) {
+                    return resp;
+                }
             }
         }
         return http:UNAUTHORIZED;
@@ -64,6 +67,41 @@ function checkScopes(http:Headers headers) returns boolean|error? {
 
     if (payload.hasKey("scope")) {
         if (payload["scope"] == "scope1 scope2") {
+            return true;
+        } else {
+            return false;
+        }
+    } else {
+        return false;
+    }
+}
+
+function checkIat(http:Headers headers) returns boolean|error? {
+
+    var authHeader = headers.getHeader("Authorization");
+    if authHeader is http:HeaderNotFoundError {
+        return authHeader;
+    } else {
+        if (authHeader.startsWith("Bearer ")) {
+            authHeader = authHeader.substring(7);
+        }
+    }
+
+    if (authHeader is http:HeaderNotFoundError) {
+        return authHeader;
+    }
+
+    [jwt:Header, jwt:Payload] [_, payload] = check jwt:decode(authHeader);
+
+    if (payload.hasKey("iat")) {
+        int iat = <int>payload["iat"];
+        int currentTime = time:currentTime().unixTime();
+        
+        // Optional: Define an acceptable time window, e.g., 5 minutes (300 seconds)
+        int acceptableWindow = 300;
+
+        // Check if the iat is within the acceptable time window
+        if ((currentTime - iat) <= acceptableWindow) {
             return true;
         } else {
             return false;
