@@ -28,45 +28,39 @@ service / on new http:Listener(8090) {
 
 function getIssuer(http:Headers headers) returns string|error {
 
-    var jwtHeader = headers.getHeader("x-jwt-assertion");
-    if jwtHeader is http:HeaderNotFoundError {
-        var authHeader = headers.getHeader("Authorization");
-        if authHeader is http:HeaderNotFoundError {
-            return authHeader;
-        } else {
-            if (authHeader.startsWith("Bearer ")) {
-                jwtHeader = authHeader.substring(7);
-            }
+    var authHeader = headers.getHeader("Authorization");
+    if authHeader is http:HeaderNotFoundError {
+        return authHeader;
+    } else {
+        if (authHeader.startsWith("Bearer ")) {
+            authHeader = authHeader.substring(7);
         }
     }
 
-    if (jwtHeader is http:HeaderNotFoundError) {
-        return jwtHeader;
+    if (authHeader is http:HeaderNotFoundError) {
+        return authHeader;
     }
 
-    [jwt:Header, jwt:Payload] [_, payload] = check jwt:decode(jwtHeader);
+    [jwt:Header, jwt:Payload] [_, payload] = check jwt:decode(authHeader);
     return <string>payload.iss;
 }
 
 function checkScopes(http:Headers headers) returns boolean|error? {
 
-    var jwtHeader = headers.getHeader("x-jwt-assertion");
-    if jwtHeader is http:HeaderNotFoundError {
-        var authHeader = headers.getHeader("Authorization");
-        if authHeader is http:HeaderNotFoundError {
-            return authHeader;
-        } else {
-            if (authHeader.startsWith("Bearer ")) {
-                jwtHeader = authHeader.substring(7);
-            }
+    var authHeader = headers.getHeader("Authorization");
+    if authHeader is http:HeaderNotFoundError {
+        return authHeader;
+    } else {
+        if (authHeader.startsWith("Bearer ")) {
+            authHeader = authHeader.substring(7);
         }
     }
 
-    if (jwtHeader is http:HeaderNotFoundError) {
-        return jwtHeader;
+    if (authHeader is http:HeaderNotFoundError) {
+        return authHeader;
     }
 
-    [jwt:Header, jwt:Payload] [_, payload] = check jwt:decode(jwtHeader);
+    [jwt:Header, jwt:Payload] [_, payload] = check jwt:decode(authHeader);
 
     if (payload.hasKey("scope")) {
         if (payload["scope"] == "scope1 scope2") {
