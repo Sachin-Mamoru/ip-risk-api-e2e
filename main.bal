@@ -11,7 +11,7 @@ type RiskRequest record {
 };
 
 service / on new http:Listener(8090) {
-    resource function post risk(http:Headers headers, @http:Payload RiskRequest req) returns http:Unauthorized & readonly|error|RiskResponse {
+    resource function post risk(http:Headers headers, @http:Payload RiskRequest req) returns http:Unauthorized|error|RiskResponse {
 
         RiskResponse resp = {
             hasRisk: true
