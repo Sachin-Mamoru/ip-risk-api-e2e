@@ -1,5 +1,6 @@
 import ballerina/http;
 import ballerina/jwt;
+import ballerina/io;
 
 type RiskResponse record {
     boolean hasRisk;
@@ -16,6 +17,10 @@ service / on new http:Listener(8090) {
         RiskResponse resp = {
             hasRisk: true
         };
+
+        io:println("recieved");
+
+        io:println(getIssuer(headers));
 
         if (getIssuer(headers) == "https://api.asgardeo.io/t/sachinmtestorg2/oauth2/token"){
             if (check checkScopes(headers) ?: false) {
