@@ -18,12 +18,6 @@ service / on new http:Listener(8090) {
             hasRisk: true
         };
 
-        io:println("recieved");
-
-        io:println(getIssuer(headers));
-
-        io:println((check headers.getHeader("x-jwt-assertion")).toString());
-
         if (getIssuer(headers) == "https://api.asgardeo.io/t/sachinmtestorg2/oauth2/token"){
             if (check checkScopes(headers) ?: false) {
                 return resp;
