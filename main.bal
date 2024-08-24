@@ -33,33 +33,45 @@ service / on new http:Listener(8090) {
 
 function getIssuer(http:Headers headers) returns string|error {
 
-    var token = "";
-    var authHeader = headers.getHeader("Authorization");
-    if authHeader is http:HeaderNotFoundError {
-        return authHeader;
-    } else {
-        if (authHeader.startsWith("Bearer ")) {
-            token = authHeader.substring(7);
+    var jwtHeader = headers.getHeader("x-jwt-assertion");
+    if jwtHeader is http:HeaderNotFoundError {
+        var authHeader = headers.getHeader("Authorization");
+        if authHeader is http:HeaderNotFoundError {
+            return authHeader;
+        } else {
+            if (authHeader.startsWith("Bearer ")) {
+                jwtHeader = authHeader.substring(7);
+            }
         }
     }
 
-    [jwt:Header, jwt:Payload] [_, payload] = check jwt:decode(token);
+    if (jwtHeader is http:HeaderNotFoundError) {
+        return jwtHeader;
+    }
+
+    [jwt:Header, jwt:Payload] [_, payload] = check jwt:decode(jwtHeader);
     return <string>payload.iss;
 }
 
 function checkScopes(http:Headers headers) returns boolean|error? {
 
-    var token = "";
-    var authHeader = headers.getHeader("Authorization");
-    if authHeader is http:HeaderNotFoundError {
-        return authHeader;
-    } else {
-        if (authHeader.startsWith("Bearer ")) {
-            token = authHeader.substring(7);
+    var jwtHeader = headers.getHeader("x-jwt-assertion");
+    if jwtHeader is http:HeaderNotFoundError {
+        var authHeader = headers.getHeader("Authorization");
+        if authHeader is http:HeaderNotFoundError {
+            return authHeader;
+        } else {
+            if (authHeader.startsWith("Bearer ")) {
+                jwtHeader = authHeader.substring(7);
+            }
         }
     }
 
-    [jwt:Header, jwt:Payload] [_, payload] = check jwt:decode(token);
+    if (jwtHeader is http:HeaderNotFoundError) {
+        return jwtHeader;
+    }
+
+    [jwt:Header, jwt:Payload] [_, payload] = check jwt:decode(jwtHeader);
 
     if (payload.hasKey("scope")) {
         if (payload["scope"] == "scope1 scope2") {
