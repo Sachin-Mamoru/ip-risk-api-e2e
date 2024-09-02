@@ -1,6 +1,7 @@
 import ballerina/http;
 import ballerina/jwt;
 import ballerina/time;
+import ballerina/io;
 
 configurable string issuer = ?;
 configurable string requiredScopes = ?;
@@ -63,6 +64,14 @@ service / on new http:Listener(8090) {
             data: req
         };
 
+        io:println("Issuer: ", getIssuer(headers));
+        io:println("Scopes: ", check checkScopes(headers) ?: false);
+        io:println("Iat: ", check checkIat(headers) ?: false);
+        io:println("Request: ", req);
+        io:println("Headers: ", headers);
+        io:println("Issuer: ", issuer);
+        io:println("Required Scopes: ", requiredScopes);
+
         if (getIssuer(headers) == issuer){
             if (check checkScopes(headers) ?: false) {
                 if (check checkIat(headers) ?: false) {
@@ -109,6 +118,8 @@ function checkScopes(http:Headers headers) returns boolean|error? {
     }
 
     [jwt:Header, jwt:Payload] [_, payload] = check jwt:decode(authHeader);
+
+    io:println("Scopes: ", payload["scope"]);
 
     if (payload.hasKey("scope")) {
         if (payload["scope"] == requiredScopes) {
