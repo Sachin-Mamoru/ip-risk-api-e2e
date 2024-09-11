@@ -99,6 +99,7 @@ function getIssuer(http:Headers headers) returns string|error {
     }
 
     [jwt:Header, jwt:Payload] [_, payload] = check jwt:decode(authHeader);
+    io:println("Issuer: ", payload);
     return <string>payload.iss;
 }
 
