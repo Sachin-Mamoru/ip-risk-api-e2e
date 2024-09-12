@@ -133,7 +133,7 @@ function checkScopes(http:Headers headers) returns boolean|error? {
     }
 }
 
-function checkIat(http:Headers headers) returns boolean|error? {
+function checkExp(http:Headers headers) returns boolean|error? {
 
     var authHeader = headers.getHeader("Authorization");
     if authHeader is http:HeaderNotFoundError {
@@ -150,16 +150,13 @@ function checkIat(http:Headers headers) returns boolean|error? {
 
     [jwt:Header, jwt:Payload] [_, payload] = check jwt:decode(authHeader);
 
-    if (payload.hasKey("iat")) {
-        int iat = <int>payload["iat"];
+    if (payload.hasKey("exp")) {
+        int exp = <int>payload["exp"];
         time:Utc currentUtc = time:utcNow();
         int currentTime = currentUtc[0];
-        
-        // Optional: Define an acceptable time window, e.g., 5 minutes (300 seconds)
-        int acceptableWindow = 300;
 
-        // Check if the iat is within the acceptable time window
-        if ((currentTime - iat) <= acceptableWindow) {
+        // Check if the token has expired
+        if (currentTime <= exp) {
             return true;
         } else {
             return false;
