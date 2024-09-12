@@ -50,7 +50,7 @@ service / on new http:Listener(8090) {
 
         if (getIssuer(headers) == issuer){
             if (check checkScopes(headers) ?: false) {
-                if (check checkIat(headers) ?: false) {
+                if (check checkExp(headers) ?: false) {
                     return resp;
                 }
             }
@@ -66,7 +66,7 @@ service / on new http:Listener(8090) {
 
         io:println("Issuer: ", getIssuer(headers));
         io:println("Scopes: ", check checkScopes(headers) ?: false);
-        io:println("Iat: ", check checkIat(headers) ?: false);
+        io:println("Iat: ", check checkExp(headers) ?: false);
         io:println("Request: ", req);
         io:println("Headers: ", headers);
         io:println("Issuer: ", issuer);
@@ -74,7 +74,7 @@ service / on new http:Listener(8090) {
 
         if (getIssuer(headers) == issuer){
             if (check checkScopes(headers) ?: false) {
-                if (check checkIat(headers) ?: false) {
+                if (check checkExp(headers) ?: false) {
                     return resp;
                 }
             }
